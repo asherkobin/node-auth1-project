@@ -43,6 +43,9 @@ authRouter.post("/login", async (req, res) => {
       const { password } = await usersModel.findByUsername(userInfo.username);
       
       if (compareWithHash(userInfo.password, password)) {
+        req.session.loggedIn = true;
+        req.session.username = userInfo.username;
+        
         res.status(200).json("Logged In");
       }
       else {
@@ -53,6 +56,14 @@ authRouter.post("/login", async (req, res) => {
       res.status(500).json(e.toString());
     }
   }
+});
+
+authRouter.get("/logout", (req, res) => {
+  if (req.session) {
+    req.session.destroy();
+  }
+  
+  res.status(200).json("Logged Out");
 });
 
 module.exports = authRouter;
